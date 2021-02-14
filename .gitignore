@@ -1,0 +1,5 @@
+.idea
+src/Controller/*
+src/Entity/*
+src/Repository/*
+map.php
