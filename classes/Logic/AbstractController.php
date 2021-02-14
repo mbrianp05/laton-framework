@@ -9,7 +9,7 @@ abstract class AbstractController
 {
     public function render(string $file, array $variables = [], Response $response = null): Response
     {
-        $vm = new TemplateManager(dirname(dirname(__DIR__)) . '/src/templates');
+        $vm = new TemplateManager(dirname(dirname(__DIR__)) . '/templates');
 
         if (null == $response) {
             $response = new Response();
