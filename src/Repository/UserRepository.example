@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repository;
+
+use Mbrianp\FuncCollection\ORM\AbstractRepository;
+
+class UserRepository extends AbstractRepository
+{
+
+}

@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use Mbrianp\FuncCollection\Http\Response;
+use Mbrianp\FuncCollection\Logic\AbstractController;
+use Mbrianp\FuncCollection\ORM\ConnectionFactory;
+use Mbrianp\FuncCollection\ORM\ConnectionParameters;
+use Mbrianp\FuncCollection\ORM\SchemaGenerator;
+use Mbrianp\FuncCollection\Routing\Attribute\Route;
+
+class AppController extends AbstractController
+{
+    #[Route('/', name: 'index')]
+    public function index(): Response
+    {
+        // Verificar si el ID se ha definido
+        // Crear el archivo de configuracion para las dependencias
+        // Crear el archivo .ini para configurar las variables de las dependencias
+        // Probar substr_replace
+        // Crear el repositorio de las entidades
+
+        $params = new ConnectionParameters('localhost', 'root', '', 'testingframework');
+        $connection = new ConnectionFactory($params);
+        //$em = new EntityManager($connection->getDriverConnection());
+        //$em->getRepository(User::class);
+
+        $schemaGenerator = new SchemaGenerator($connection->getDriverConnection());
+        $schemaGenerator->createEntityTable(User::class);
+
+        // $user = new User();
+        // $user->name = 'Brian';
+
+        // $em->persist($user);
+
+        return $this->render('index.html.php');
+    }
+
+    #[Route('/contact/{user}', name: 'contact', requirements: ['user' => '@[a-zA-Z0-9]+'])]
+    public function contact(string $user): Response
+    {
+        return $this->render('contact.html.php', ['user' => $user]);
+    }
+}
