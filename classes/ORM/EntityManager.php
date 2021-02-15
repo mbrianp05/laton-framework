@@ -34,12 +34,22 @@ class EntityManager
         $schema = $metadataResolver->getSchema();
 
         $columns = $schema->columns;
-        $columns = array_map(fn(Column $column): string => $column->name, $columns);
-
         $values = [];
 
         foreach ($columns as $column) {
-            $values[$column] = $entity->$column;
+            if (isset($column->options['filled_value'])) {
+                $attribute = $column->options['filled_value'];
+                $filledValues = array_map(fn (string $column): ?string => $entity->$column, $attribute->columns);
+
+                $pattern = $attribute->pattern ?? \str_repeat('%s ', \count($filledValues));
+                $value = \sprintf(\trim($pattern), ...$filledValues);
+
+                $values[$column->name] = $value;
+
+                continue;
+            }
+
+            $values[$column->name] = $entity->{$column->name};
         }
 
         return $this->driver->insert($schema->table->name, $values);

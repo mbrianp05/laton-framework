@@ -9,7 +9,7 @@ class Autoloader
     protected function psr4NamespaceFileResolver(string $fullyQualifiedName): string
     {
         foreach ($this->config as $namespace => $dir) {
-            if (($target = str_replace($namespace, '', $fullyQualifiedName)) != $fullyQualifiedName) {
+            if (($target = \str_replace($namespace, '', $fullyQualifiedName)) != $fullyQualifiedName) {
                 return $dir . $target;
             }
         }

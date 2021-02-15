@@ -2,6 +2,7 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
+use Mbrianp\FuncCollection\ORM\Attributes\FilledValue;
 use Mbrianp\FuncCollection\ORM\Attributes\Id;
 use Mbrianp\FuncCollection\ORM\Attributes\Repository;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
@@ -99,6 +100,8 @@ class EntityMetadataResolver
      */
     protected function resolveColumnMetadata(Column $column, ReflectionProperty $property): Column
     {
+        $filledValueAttributes = $property->getAttributes(FilledValue::class);
+
         if (null == $column->name) {
             $column->name = Utils::resolveValidIdentifier($property->getName());
         }
@@ -109,6 +112,12 @@ class EntityMetadataResolver
             if (!$property->getType() instanceof ReflectionUnionType) {
                 $column->type = $property->getType()->getName();
             }
+        }
+
+        if (1 <= \count($filledValueAttributes)) {
+            $filledValueAttribute = $filledValueAttributes[0]->newInstance();
+
+            $column->options['filled_value'] = $filledValueAttribute;
         }
 
         return $column;

@@ -35,6 +35,12 @@ class ResultFormatter
                 throw new RuntimeException(\sprintf('Cannot assign the value %s to an unknown property', $value));
             }
 
+            $property = \array_filter(\array_keys(\get_class_vars($entityInstance::class)), fn (string $property_): bool => \strtolower($property_) == $property);
+
+            if (1 >= count($property)) {
+                $property = $property[\array_key_first($property)];
+            }
+
             $entityInstance->$property = $value;
         }
 

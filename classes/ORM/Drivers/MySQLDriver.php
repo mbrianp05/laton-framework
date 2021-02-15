@@ -65,9 +65,9 @@ class MySQLDriver implements DatabaseDriverInterface
         $sql = 'CREATE TABLE ' . $name . ' ( ';
 
         foreach ($schema->columns as $column) {
-            $sql .= $column->name . ' ' . $column->type;
+            $sql .= $column->name . ' ' . static::resolveType($column->type);
 
-            if ('VARCHAR' == \strtoupper($column->type)) {
+            if ('VARCHAR' == static::resolveType($column->type)) {
                 $sql .= '(' . $column->length . ')';
             }
 
@@ -148,7 +148,7 @@ class MySQLDriver implements DatabaseDriverInterface
         return match($phptype) {
             'string' => 'VARCHAR',
             'integer' => 'int',
-            default => throw new LogicException(\sprintf('No equivalent was found for type %s', $phptype)),
+            default => $phptype,
         };
     }
 }

@@ -24,7 +24,7 @@ class FilledValue
 {
     public function __construct(
         public array $columns,
-        public string $pattern,
+        public ?string $pattern = null,
     )
     {
     }
