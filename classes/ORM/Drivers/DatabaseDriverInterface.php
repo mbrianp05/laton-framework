@@ -2,13 +2,20 @@
 
 namespace Mbrianp\FuncCollection\ORM\Drivers;
 
-use App\classes\ORM\Drivers\QueryDriverInterface;
 use Mbrianp\FuncCollection\ORM\Schema;
 use PDO;
 
 interface DatabaseDriverInterface
 {
-    public function select(string $table, string $fields): QueryDriverInterface;
+    /**
+     * If the fields parameters is "" or null means that
+     * everything must be selected.
+     *
+     * @param string $table
+     * @param string|array|null $fields
+     * @return QueryDriverInterface
+     */
+    public function select(string $table, string|array|null $fields = null): QueryDriverInterface;
 
     public function insert(string $table, array $values): bool;
 
@@ -19,6 +26,14 @@ interface DatabaseDriverInterface
     public function addSQL(string $sql): void;
 
     public function do(): void;
+
+    /**
+     * Will convert a PHP Type (like string, integer) into SQL Type (like VARCHAR, INT, respectively)
+     *
+     * @param string $phptype
+     * @return string
+     */
+    public static function resolveType(string $phptype): string;
 
     public function __construct(PDO $connection);
 }

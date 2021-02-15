@@ -2,9 +2,8 @@
 
 namespace Mbrianp\FuncCollection\ORM\Drivers;
 
-use App\classes\ORM\Drivers\QueryDriverInterface;
-use App\classes\ORM\Drivers\MySQLQueryDriver;
 use LogicException;
+use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use Mbrianp\FuncCollection\ORM\Schema;
 use PDO;
 
@@ -16,7 +15,7 @@ class MySQLDriver implements DatabaseDriverInterface
     {
     }
 
-    public function select(string $table, string|array $fields = []): QueryDriverInterface
+    public function select(string $table, string|array|null $fields = null): MySQLQueryDriver
     {
         return new MySQLQueryDriver($this->connection, $fields, $table);
     }
@@ -45,7 +44,7 @@ class MySQLDriver implements DatabaseDriverInterface
             }
         }
 
-        $validCodes = \array_map(fn(string $value): string => \var_export($value, true), $values);
+        $validCodes = \array_map(fn(?string $value): string => \var_export($value, true), $values);
         $sql .= \implode(', ', $resolvedColumns) . ') VALUES (' . \implode(', ', $validCodes) . ')';
 
         $this->addSQL($sql);
@@ -63,7 +62,7 @@ class MySQLDriver implements DatabaseDriverInterface
     {
         // CREATE TABLE users ( `id` INT NOT NULL AUTO_INCREMENT , PRIMARY KEY (`id`)) ENGINE = InnoDB;
         $name = $schema->table->name;
-        $sql = 'CREATE TABLE ' . $name . ' (';
+        $sql = 'CREATE TABLE ' . $name . ' ( ';
 
         foreach ($schema->columns as $column) {
             $sql .= $column->name . ' ' . $column->type;
@@ -76,21 +75,29 @@ class MySQLDriver implements DatabaseDriverInterface
                 $sql .= ' NOT NULL';
             }
 
-            if (isset($column->options['AUTO_INCREMENTS']) && true == $column->options['AUTO_INCREMENTS']) {
+            $isOption = fn (string $option, Column $column): bool => isset($column->options[$option]) && true == $column->options[$option];
+
+            if ($isOption('AUTO_INCREMENTS', $column)) {
                 $sql .= ' AUTO_INCREMENT';
-                $sql .= ' , PRIMARY KEY (' . $column->name . ')';
-            } elseif (isset($column->options['PRIMARY_KEY']) && true == $column->options['PRIMARY_KEY']) {
+
+                // Now this is false so the next if will active
+                $column->options['AUTO_INCREMENTS'] = false;
+            }
+
+            if ($isOption('PRIMARY_KEY', $column)) {
+                // Only happens if PRIMARY_KEY IS ENABLED
                 $sql .= ' , PRIMARY KEY (' . $column->name . ')';
             }
 
-            $sql .= ', ';
+            if (true == $column->unique) {
+                $sql .= ' , UNIQUE INDEX ' . \strtoupper(\uniqid('UNIQ_')) . ' (' . $column->name . ') ';
+            }
+
+            $sql .= ' , ';
         }
 
-        $sql = substr($sql, 0, -2) . ' )';
+        $sql = substr($sql, 0, -2) . ') ENGINE = InnoDB';
         $this->addSQL($sql);
-
-        \var_dump($sql);
-        die();
 
         try {
             $this->do();
@@ -134,5 +141,14 @@ class MySQLDriver implements DatabaseDriverInterface
                 throw new LogicException($this->connection->errorCode());
             }
         }
+    }
+
+    public static function resolveType(string $phptype): string
+    {
+        return match($phptype) {
+            'string' => 'VARCHAR',
+            'integer' => 'int',
+            default => throw new LogicException(\sprintf('No equivalent was found for type %s', $phptype)),
+        };
     }
 }

@@ -8,6 +8,11 @@ use Mbrianp\FuncCollection\Http\HttpParameterResolver;
 use Mbrianp\FuncCollection\Http\ParamStack;
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Http\Response;
+use Mbrianp\FuncCollection\Logic\AbstractController;
+use Mbrianp\FuncCollection\ORM\ConnectionFactory;
+use Mbrianp\FuncCollection\ORM\ConnectionParameters;
+use Mbrianp\FuncCollection\ORM\EntityManager;
+use Mbrianp\FuncCollection\ORM\ORMParameterResolver;
 use Mbrianp\FuncCollection\Routing\Attribute\Route;
 use Mbrianp\FuncCollection\Routing\Router;
 use Mbrianp\FuncCollection\Routing\RouterParameterResolver;
@@ -25,13 +30,14 @@ class Kernel
     protected array $parametersResolvers = [
         HttpParameterResolver::class,
         RouterParameterResolver::class,
+        ORMParameterResolver::class,
     ];
 
     protected const NESTED_ROUTES_SEPARATOR = '_';
 
     protected DIC $dependenciesContainer;
 
-    public function __construct(protected array $registeredControllers = [])
+    public function __construct(protected array $config, protected array $registeredControllers = [])
     {
         $this->initContainer();
     }
@@ -45,6 +51,15 @@ class Kernel
 
         $request = new Service('http.request', Request::class, [$get, $post, $_SERVER['PATH_INFO'] ?? '/', $_SERVER['REQUEST_METHOD']]);
         $this->dependenciesContainer->addService($request);
+
+        // EntityManager
+
+        $dbParams = new ConnectionParameters($this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']);
+        $connectionFactory = new ConnectionFactory($dbParams);
+        $driver = $connectionFactory->getDriverConnection();
+
+        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$driver]);
+        $this->dependenciesContainer->addService($entityManagerService);
     }
 
     /**
@@ -110,6 +125,7 @@ class Kernel
                  */
                 $resolver = new $parameterResolver($this->dependenciesContainer);
 
+
                 if ($resolver->supports($parameter)) {
                     $resolvedParameters[] = $resolver->resolve();
                 }
@@ -147,8 +163,13 @@ class Kernel
 
         $rm = new ReflectionMethod($controller, $method);
         $params = $this->resolveParams($rm->getParameters());
+        $constructorParams = [];
 
-        $controller = new $controller();
+        if (\in_array(AbstractController::class, \class_parents($controller))) {
+            $constructorParams[] = $this->config['templates_dir'];
+        }
+
+        $controller = new $controller(...$constructorParams);
         $response = $controller->$method(...$params);
 
         if (!$response instanceof Response) {

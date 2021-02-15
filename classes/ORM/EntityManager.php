@@ -38,7 +38,6 @@ class EntityManager
 
         $values = [];
 
-
         foreach ($columns as $column) {
             $values[$column] = $entity->$column;
         }

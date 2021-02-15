@@ -1,6 +1,6 @@
 <?php
 
-namespace App\classes\ORM\Drivers;
+namespace Mbrianp\FuncCollection\ORM\Drivers;
 
 use LogicException;
 use PDO;
@@ -14,10 +14,23 @@ class MySQLQueryDriver implements QueryDriverInterface
 
     protected string $sql = '';
 
-    public function __construct(protected PDO $connection, array|string $fields, protected string $table)
+    public function __construct(protected PDO $connection, null|array|string $fields, protected string $table)
     {
+        // Fields parameter whatever it is (null or string or array) will be converted into an array
+        // If it's null will be an empty array
+        // If it's an empty string will also be an empty array
+        // If it's not an empty string will be an array with that string in the array
+
+        if (null === $fields) {
+            $fields = '';
+        }
+
         if (is_string($fields)) {
-            $fields = [$fields];
+            if (!empty($fields)) {
+                $fields = [$fields];
+            } else {
+                $fields = [];
+            }
         }
 
         $this->initSelect($fields);
@@ -25,17 +38,24 @@ class MySQLQueryDriver implements QueryDriverInterface
 
     public function initSelect(array $fields): void
     {
-        $this->sql = 'SELECT ' . implode(', ', $fields) . ' FROM ' . $this->table;
+        if (empty($fields)) {
+            $selection = '*';
+        } else {
+            $selection = implode(', ', $fields);
+        }
+
+        $this->sql = 'SELECT ' . $selection . ' FROM ' . $this->table;
     }
 
     protected function getCondition(string $field, string|float|int $value, string $operator = self::E): string
     {
-        return $field . $operator . \var_export($value);
+        return $field . $operator . \var_export($value, true);
     }
 
     public function where(string $field, string|float|int $value, string $operator = self::E): static
     {
         $this->isWhere = true;
+
         $this->sql .= ' WHERE ' . $this->getCondition($field, $value, $operator);
 
         return $this;
@@ -73,7 +93,7 @@ class MySQLQueryDriver implements QueryDriverInterface
     public function orderBy(array $order = []): static
     {
         if (!empty($order)) {
-            $this->sql .= 'ORDER BY';
+            $this->sql .= ' ORDER BY';
 
             foreach ($order as $field => $ord) {
                 $this->sql .= ' ' . $field . ' ' . $ord;
@@ -83,20 +103,25 @@ class MySQLQueryDriver implements QueryDriverInterface
         return $this;
     }
 
-    protected function do(): void
+    protected function do(): array|null
     {
-
+        return $this->connection->query($this->sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getSingleResult(): object
+    public function getSingleResult(): array
     {
+        $results = $this->do();
     }
 
-    public function getOneOrNullResult(): object|null
+    public function getOneOrNullResult(): array|null
     {
+        $results = $this->do();
+
+        return $results[0] ?? null;
     }
 
-    public function getResult(): array|object|null
+    public function getResults(): array|null
     {
+        return $this->do();
     }
 }

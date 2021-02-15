@@ -15,7 +15,7 @@ class Router
         public array $routes = []
     )
     {
-        $this->resolveRoutesParameterNames();
+        $this->resolveRoutesParameters();
     }
 
     /**
@@ -32,25 +32,24 @@ class Router
     {
         $path = $route->path;
 
-        $path = \preg_quote($path);
         $path = str_replace('/', '\/', $path);
 
-        return '/^' . preg_replace('/\\\{([a-z0-9_]+)\\\}/i', '(?P<$1>([^\/]+))', $path) . '$/i';
-
-        // This way is faster
-        // foreach ($route->data['__parameters'] as $parameter) {
-        //      $path = preg_replace('/{' . $parameter . '}/', '(?P<' . $parameter . '>([^\/]+))', $path);
-        //  }
-        //
-        // return '/' . $path . '$/i';
+        return '/^' . preg_replace('/{([a-z0-9_]+)}/i', '(?P<$1>([^\/]+))', $path) . '$/i';
     }
 
-    protected function resolveRoutesParameterNames(): void
+    protected function resolveRoutesParameters(): void
     {
         foreach ($this->routes as $route) {
-            preg_match_all('/{([a-z0-9_]+)}/i', $route->path, $parameters);
+            preg_match_all('/{(?P<param>[a-z0-9_]+)(<(?P<regexp>[a-z0-9_+-\/@#$^%<>~*\\\ .\[\]]+)>)?}/i', $route->path, $parameters);
 
-            $route->data['__parameters'] = $parameters[1];
+            $parameters['regexp'] = \array_combine($parameters['param'], $parameters['regexp']);
+            $needle = array_map(fn(string $regexp): string => '<' . $regexp . '>', $parameters['regexp']);
+
+            // Remove the regular expression
+            $route->path = str_replace($needle, '', $route->path);
+
+            $route->data['__parameters'] = $parameters['param'];
+            $route->requirements = $parameters['regexp'];
         }
     }
 
@@ -75,7 +74,7 @@ class Router
                 continue;
             }
 
-            if (!preg_match('/' . $requirement . '/i', $parameter_value)) {
+            if (!preg_match('/^' . $requirement . '$/i', $parameter_value)) {
                 return false;
             }
         }

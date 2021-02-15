@@ -20,7 +20,9 @@ $autoloader->run();
 
 require_once 'map.php';
 
+$config = parse_ini_file(__DIR__ . '/.ini');
+
 $classes = ClassMap::$classes;
-$kernel = new Kernel($classes);
+$kernel = new Kernel($config, $classes);
 
 $kernel->deployApp(Request::createFromGlobals());
