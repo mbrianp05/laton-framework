@@ -1,4 +1,10 @@
 <?php
+/**
+ * A WebFramework inspired on Symfony.
+ * Development started on 10/2/2021
+ *
+ * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
+ */
 
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
