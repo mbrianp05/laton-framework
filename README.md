@@ -217,7 +217,11 @@ Para hacer las consultas puedes injectar en el controlador EntityManager y con e
 
 namespace App\Controller;
 
-use App\Entity\User;use App\Repository\UserRepository;use Mbrianp\FuncCollection\Http\Response;use Mbrianp\FuncCollection\ORM\EntityManager;use Mbrianp\FuncCollection\Routing\Attribute\Route;
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Mbrianp\FuncCollection\Http\Response;
+use Mbrianp\FuncCollection\ORM\EntityManager;
+use Mbrianp\FuncCollection\Routing\Attribute\Route;
 
 class AppController
 {
