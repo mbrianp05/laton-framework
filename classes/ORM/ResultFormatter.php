@@ -2,11 +2,14 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
+use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use RuntimeException;
 
 /**
  * This class will transform an array with values from database
- * in an entity with those values in the proper properties, likes this:
+ * and will convert strings from database to the specified data type
+ * in the attributes applied in the properties of the entity
+ * in an entity with those values in the proper properties likes this:
  *
  *      // This array comes from a result from database
  *      [
@@ -19,6 +22,12 @@ use RuntimeException;
  *          name: String = "Brian",
  *          lastname: String = "Monteagudo Perez"
  *      }
+ *
+ *      DB:
+ *          "{"roles": ["USER", "ADMIN"]}" // String
+ *
+ *      Formatter:
+ *           ['roles' => ['USER', 'ADMIN']]
  */
 class ResultFormatter
 {
@@ -26,22 +35,52 @@ class ResultFormatter
     {
     }
 
+    /**
+     * Due to SQL does not accept some types like json
+     * This will convert a string with the json in it
+     * to a PHP array.
+     *
+     * @param string $valueFromDatabase
+     * @param Column $column
+     * @return string|array|object
+     */
+    public static function resolveRealPHPValue(string $valueFromDatabase, Column $column): string|array|object|int
+    {
+        return match ($column->type) {
+            null, 'string' => $valueFromDatabase,
+            'integer' => (int) $valueFromDatabase,
+            'json' => \json_decode($valueFromDatabase),
+            default => $valueFromDatabase,
+        };
+    }
+
+    public static function resolveRealSQLValue(string|array|int|null $PHPvalue, Column $column): string|int|null
+    {
+        return match ($column->type) {
+            'json' => \json_encode($PHPvalue),
+            'string' => $PHPvalue,
+            'integer' => (int) $PHPvalue,
+            default => $PHPvalue,
+        };
+    }
+
     protected function formatSingleResult(array $result): object
     {
         $entityInstance = new $this->entity();
+        $entityMetadata = new EntityMetadataResolver($entityInstance);
 
         foreach ($result as $property => $value) {
             if (!\is_string($property)) {
                 throw new RuntimeException(\sprintf('Cannot assign the value %s to an unknown property', $value));
             }
 
-            $property = \array_filter(\array_keys(\get_class_vars($entityInstance::class)), fn (string $property_): bool => \strtolower($property_) == $property);
+            $property = \array_filter(\array_keys(\get_class_vars($entityInstance::class)), fn(string $property_): bool => \strtolower($property_) == $property);
 
             if (1 >= count($property)) {
                 $property = $property[\array_key_first($property)];
             }
 
-            $entityInstance->$property = $value;
+            $entityInstance->$property = static::resolveRealPHPValue($value, $entityMetadata->getColumnAttributeOf($property));
         }
 
         return $entityInstance;

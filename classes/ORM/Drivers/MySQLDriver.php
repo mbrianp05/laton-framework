@@ -4,6 +4,8 @@ namespace Mbrianp\FuncCollection\ORM\Drivers;
 
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
+use Mbrianp\FuncCollection\ORM\EntityMetadataResolver;
+use Mbrianp\FuncCollection\ORM\ResultFormatter;
 use Mbrianp\FuncCollection\ORM\Schema;
 use PDO;
 
@@ -34,18 +36,19 @@ class MySQLDriver implements DatabaseDriverInterface
     {
         $sql = 'INSERT INTO ' . $table . '(';
 
-        $resolvedColumns = [];
+        $resolvedValues = [];
 
         foreach ($values as $column => $value) {
+            $value = \var_export($value, true);
+
             if (\is_int($column)) {
-                $resolvedColumns[] = '?';
+                $resolvedValues['?'] = $value;
             } else {
-                $resolvedColumns[] = $column;
+                $resolvedValues[$column] = $value;
             }
         }
 
-        $validCodes = \array_map(fn(?string $value): string => \var_export($value, true), $values);
-        $sql .= \implode(', ', $resolvedColumns) . ') VALUES (' . \implode(', ', $validCodes) . ')';
+        $sql .= \implode(', ', \array_keys($resolvedValues)) . ') VALUES (' . \implode(', ', $resolvedValues) . ')';
 
         $this->addSQL($sql);
 

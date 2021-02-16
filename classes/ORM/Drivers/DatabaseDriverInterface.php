@@ -28,7 +28,7 @@ interface DatabaseDriverInterface
     public function do(): void;
 
     /**
-     * Will convert a PHP Type (like string, integer) into SQL Type (like VARCHAR, INT, respectively)
+     * Will convert a PHP Type (like string, integer, json) into SQL Type (like VARCHAR, INT, VARCHAR, respectively)
      *
      * @param string $phptype
      * @return string

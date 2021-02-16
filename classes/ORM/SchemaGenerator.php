@@ -7,6 +7,10 @@ use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
 
 class SchemaGenerator
 {
+    public const CUSTOM_TYPES = [
+        'json' => 'string'
+    ];
+
     public function __construct(protected DatabaseDriverInterface $driver)
     {
     }
@@ -26,6 +30,10 @@ class SchemaGenerator
     {
         $metadataResolver = new EntityMetadataResolver($entity);
         $schema = $metadataResolver->getSchema();
+
+        foreach ($schema->columns as $column) {
+            $column->type = static::CUSTOM_TYPES[$column->type];
+        }
 
         return $this->driver->createTable($schema);
     }

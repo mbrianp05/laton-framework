@@ -39,7 +39,7 @@ class EntityManager
         foreach ($columns as $column) {
             if (isset($column->options['filled_value'])) {
                 $attribute = $column->options['filled_value'];
-                $filledValues = array_map(fn (string $column): ?string => $entity->$column, $attribute->columns);
+                $filledValues = \array_map(fn (string $column_): ?string => ResultFormatter::resolveRealSQLValue($entity->$column_, $column), $attribute->columns);
 
                 $pattern = $attribute->pattern ?? \str_repeat('%s ', \count($filledValues));
                 $value = \sprintf(\trim($pattern), ...$filledValues);
@@ -49,7 +49,7 @@ class EntityManager
                 continue;
             }
 
-            $values[$column->name] = $entity->{$column->name};
+            $values[$column->name] = ResultFormatter::resolveRealSQLValue($entity->{$column->name}, $column);
         }
 
         return $this->driver->insert($schema->table->name, $values);

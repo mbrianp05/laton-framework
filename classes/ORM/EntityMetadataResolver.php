@@ -57,9 +57,15 @@ class EntityMetadataResolver
      */
     public function getSchema(): Schema
     {
-        $reflectionClass = new ReflectionClass($this->class);
         $table = $this->getTable();
+        $columns = $this->getColumns();
 
+        return new Schema($table, $columns);
+    }
+
+    public function getColumns(): array
+    {
+        $reflectionClass = new ReflectionClass($this->class);
         $columns = [];
 
         foreach ($reflectionClass->getProperties() as $property) {
@@ -83,7 +89,7 @@ class EntityMetadataResolver
             $columns[] = $this->resolveColumnMetadata($columnAttribute, $property);
         }
 
-        return new Schema($table, $columns);
+        return $columns;
     }
 
     /**
@@ -140,5 +146,18 @@ class EntityMetadataResolver
         }
 
         return $table;
+    }
+
+    public function getColumnAttributeOf(string $property): ?Column
+    {
+        $reflectionClass = new ReflectionClass($this->class);
+        $property = $reflectionClass->getProperty($property);
+        $columnAttributes = $property->getAttributes(Column::class);
+
+        if (1 <= \count($columnAttributes)) {
+            return $this->resolveColumnMetadata($columnAttributes[0]->newInstance(), $property);
+        }
+
+        return null;
     }
 }
