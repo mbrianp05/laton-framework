@@ -54,9 +54,12 @@ class Kernel
         $this->dependenciesContainer->addService($request);
 
         // EntityManager
-        $orm = new ORM($this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']);
+        $ormService = new Service('db.orm', ORM::class, [$this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']]);
+        $this->dependenciesContainer->addService($ormService);
 
-        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$orm->getDriver()]);
+        $orm = $this->dependenciesContainer->getService('db.orm')->getDriver();
+
+        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$orm]);
         $this->dependenciesContainer->addService($entityManagerService);
     }
 
