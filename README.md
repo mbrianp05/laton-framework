@@ -81,7 +81,9 @@ el atributo seran interpretadas como columnas en la base de datos.
 
 namespace App\Entity;
 
-use Mbrianp\FuncCollection\ORM\Attributes\Column;use Mbrianp\FuncCollection\ORM\Attributes\FilledValue;use Mbrianp\FuncCollection\ORM\Attributes\Id;
+use Mbrianp\FuncCollection\ORM\Attributes\Column;
+use Mbrianp\FuncCollection\ORM\Attributes\FilledValue;
+use Mbrianp\FuncCollection\ORM\Attributes\Id;
 
 class User
 {
