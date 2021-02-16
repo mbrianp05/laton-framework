@@ -211,7 +211,7 @@ class UserRepository extends AbstractRepository
 ```
 
 Lo unico que exige AbstractRepository es que crees un metodo getRefEntity devolviendo la entidad a la que el repositorio esta relacionado.
-Para hacer las consultas puedes injectar en el controlador EntityManager y con el metodo getRepository(entityclass) obtienes el repositorio y algunos metodos para hacer consultas. Sin embargo puedes injectar directamente el repositorio.
+Para hacer las consultas puedes injectar en el controlador EntityManager y con el metodo getRepository(entityclass) obtienes el repositorio y algunos metodos para hacer consultas. Sin embargo puedes injectar directamente el repositorio tambien.
 
 ```php
 
