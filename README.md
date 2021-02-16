@@ -127,7 +127,8 @@ Antes cambia la configuracion de la conexion a la base de datos en .ini (por def
 namespace App\Controller;
 
 use App\Entity\User;
-use Mbrianp\FuncCollection\Http\Response;use Mbrianp\FuncCollection\ORM\ORM;
+use Mbrianp\FuncCollection\Http\Response;
+use Mbrianp\FuncCollection\ORM\ORM;
 
 class Controller
 {
@@ -163,6 +164,7 @@ class AppController
         $user->email = 'email@email.email';
         $user->password = 'password';
         
+        // Insertar
         $manager->persist($user);
         
         // Response here.
@@ -195,7 +197,8 @@ La clase UserRepository va en src/Repository y hereda de AbstractRepository para
 
 namespace App\Repository;
 
-use App\Entity\User;use Mbrianp\FuncCollection\ORM\AbstractRepository;
+use App\Entity\User;
+use Mbrianp\FuncCollection\ORM\AbstractRepository;
 
 class UserRepository extends AbstractRepository
 {
