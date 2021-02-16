@@ -3,8 +3,8 @@
 namespace Mbrianp\FuncCollection\ORM;
 
 use LogicException;
-use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
+use ReflectionAttribute;
 
 class EntityManager
 {
@@ -37,19 +37,32 @@ class EntityManager
         $values = [];
 
         foreach ($columns as $column) {
-            if (isset($column->options['filled_value'])) {
-                $attribute = $column->options['filled_value'];
-                $filledValues = \array_map(fn (string $column_): ?string => ResultFormatter::resolveRealSQLValue($entity->$column_, $column), $attribute->columns);
+            $valueResolvers = ORM::getValueResolvers();
+            $types = ORM::getTypes();
 
-                $pattern = $attribute->pattern ?? \str_repeat('%s ', \count($filledValues));
-                $value = \sprintf(\trim($pattern), ...$filledValues);
+            $attributes = $metadataResolver->getAttributes($column->options['property']);
 
-                $values[$column->name] = $value;
+            $valueResolvers = \array_filter($attributes, fn(ReflectionAttribute $attr): bool => \in_array($attr->getName(), $valueResolvers));
+            $value = null;
 
-                continue;
+            foreach ($valueResolvers as $resolver) {
+                $resolver = $resolver->newInstance();
+                $value = $resolver->resolve($values);
             }
 
-            $values[$column->name] = ResultFormatter::resolveRealSQLValue($entity->{$column->name}, $column);
+            // This means that the value has no resolvers
+            // SO the var keeps being null
+            if (null === $value) {
+                $value = $entity->{$column->options['property']};
+            }
+
+            if (\array_key_exists($column->type, $types)) {
+                $type = new $types[$column->type]();
+
+                $value = $type->resolveToSQL($value);
+            }
+
+            $values[$column->options['property']] = $value;
         }
 
         return $this->driver->insert($schema->table->name, $values);

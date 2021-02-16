@@ -49,7 +49,6 @@ class MySQLDriver implements DatabaseDriverInterface
         }
 
         $sql .= \implode(', ', \array_keys($resolvedValues)) . ') VALUES (' . \implode(', ', $resolvedValues) . ')';
-
         $this->addSQL($sql);
 
         try {

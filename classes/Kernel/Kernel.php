@@ -12,6 +12,7 @@ use Mbrianp\FuncCollection\Logic\AbstractController;
 use Mbrianp\FuncCollection\ORM\ConnectionFactory;
 use Mbrianp\FuncCollection\ORM\ConnectionParameters;
 use Mbrianp\FuncCollection\ORM\EntityManager;
+use Mbrianp\FuncCollection\ORM\ORM;
 use Mbrianp\FuncCollection\ORM\ORMParameterResolver;
 use Mbrianp\FuncCollection\Routing\Attribute\Route;
 use Mbrianp\FuncCollection\Routing\Router;
@@ -53,12 +54,9 @@ class Kernel
         $this->dependenciesContainer->addService($request);
 
         // EntityManager
+        $orm = new ORM($this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']);
 
-        $dbParams = new ConnectionParameters($this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']);
-        $connectionFactory = new ConnectionFactory($dbParams);
-        $driver = $connectionFactory->getDriverConnection();
-
-        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$driver]);
+        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$orm->getDriver()]);
         $this->dependenciesContainer->addService($entityManagerService);
     }
 

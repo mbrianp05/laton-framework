@@ -27,7 +27,7 @@ use RuntimeException;
  *          "{"roles": ["USER", "ADMIN"]}" // String
  *
  *      Formatter:
- *           ['roles' => ['USER', 'ADMIN']]
+ *           ['roles' => ['USER', 'ADMIN']] // Array
  */
 class ResultFormatter
 {
@@ -35,33 +35,18 @@ class ResultFormatter
     {
     }
 
-    /**
-     * Due to SQL does not accept some types like json
-     * This will convert a string with the json in it
-     * to a PHP array.
-     *
-     * @param string $valueFromDatabase
-     * @param Column $column
-     * @return string|array|object
-     */
-    public static function resolveRealPHPValue(string $valueFromDatabase, Column $column): string|array|object|int
+    protected function formatValue(string $value, Column $column): mixed
     {
-        return match ($column->type) {
-            null, 'string' => $valueFromDatabase,
-            'integer' => (int) $valueFromDatabase,
-            'json' => \json_decode($valueFromDatabase),
-            default => $valueFromDatabase,
-        };
-    }
+        $types = ORM::getTypes();
 
-    public static function resolveRealSQLValue(string|array|int|null $PHPvalue, Column $column): string|int|null
-    {
-        return match ($column->type) {
-            'json' => \json_encode($PHPvalue),
-            'string' => $PHPvalue,
-            'integer' => (int) $PHPvalue,
-            default => $PHPvalue,
-        };
+        if (!\array_key_exists($column->type, $types)) {
+            return $value;
+        }
+
+        $type = $types[$column->type];
+        $type = new $type();
+
+        return $type->resolveToPHP($value);
     }
 
     protected function formatSingleResult(array $result): object
@@ -80,7 +65,7 @@ class ResultFormatter
                 $property = $property[\array_key_first($property)];
             }
 
-            $entityInstance->$property = static::resolveRealPHPValue($value, $entityMetadata->getColumnAttributeOf($property));
+            $entityInstance->$property = $this->formatValue($value, $entityMetadata->getColumnAttribute($property));
         }
 
         return $entityInstance;

@@ -2,15 +2,10 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
-use Mbrianp\FuncCollection\ORM\Attributes\Table;
 use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
 
 class SchemaGenerator
 {
-    public const CUSTOM_TYPES = [
-        'json' => 'string'
-    ];
-
     public function __construct(protected DatabaseDriverInterface $driver)
     {
     }
@@ -32,7 +27,10 @@ class SchemaGenerator
         $schema = $metadataResolver->getSchema();
 
         foreach ($schema->columns as $column) {
-            $column->type = static::CUSTOM_TYPES[$column->type];
+            if (\array_key_exists($column->type, ORM::getTypes())) {
+                $type = ORM::getTypes()[$column->type]::getFinalType();
+                $column->type = $type;
+            }
         }
 
         return $this->driver->createTable($schema);

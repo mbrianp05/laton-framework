@@ -2,7 +2,6 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
-use Mbrianp\FuncCollection\ORM\Attributes\FilledValue;
 use Mbrianp\FuncCollection\ORM\Attributes\Id;
 use Mbrianp\FuncCollection\ORM\Attributes\Repository;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
@@ -17,13 +16,13 @@ use ReflectionUnionType;
  */
 class EntityMetadataResolver
 {
-    public function __construct(protected string|object $class)
+    public function __construct(protected string|object $entity)
     {
     }
 
     public function getIdProperty(): ?ReflectionProperty
     {
-        $reflectionClass = new ReflectionClass($this->class);
+        $reflectionClass = new ReflectionClass($this->entity);
 
         foreach ($reflectionClass->getProperties() as $property) {
             if (1 <= count($property->getAttributes(Id::class))) {
@@ -40,7 +39,7 @@ class EntityMetadataResolver
      */
     public function getRepositoryClass(): ?string
     {
-        $reflectionClass = new ReflectionClass($this->class);
+        $reflectionClass = new ReflectionClass($this->entity);
         $repositoryAttributes = $reflectionClass->getAttributes(Repository::class);
 
         if (1 <= count($repositoryAttributes)) {
@@ -65,28 +64,23 @@ class EntityMetadataResolver
 
     public function getColumns(): array
     {
-        $reflectionClass = new ReflectionClass($this->class);
+        $reflectionClass = new ReflectionClass($this->entity);
         $columns = [];
 
         foreach ($reflectionClass->getProperties() as $property) {
-            $columnAttributes = $property->getAttributes(Column::class);
+            $columnAttribute = $this->getColumnAttribute($property->getName());
             $idAttributes = $property->getAttributes(Id::class);
 
-            if (0 == count($columnAttributes)) {
+            if (null == $columnAttribute) {
                 continue;
             }
-
-            /**
-             * @var Column $columnAttribute
-             */
-            $columnAttribute = $columnAttributes[0]->newInstance();
 
             if (1 <= count($idAttributes)) {
                 $columnAttribute->options['AUTO_INCREMENTS'] = true;
                 $columnAttribute->options['PRIMARY_KEY'] = true;
             }
 
-            $columns[] = $this->resolveColumnMetadata($columnAttribute, $property);
+            $columns[] = $columnAttribute;
         }
 
         return $columns;
@@ -106,8 +100,6 @@ class EntityMetadataResolver
      */
     protected function resolveColumnMetadata(Column $column, ReflectionProperty $property): Column
     {
-        $filledValueAttributes = $property->getAttributes(FilledValue::class);
-
         if (null == $column->name) {
             $column->name = Utils::resolveValidIdentifier($property->getName());
         }
@@ -120,11 +112,7 @@ class EntityMetadataResolver
             }
         }
 
-        if (1 <= \count($filledValueAttributes)) {
-            $filledValueAttribute = $filledValueAttributes[0]->newInstance();
-
-            $column->options['filled_value'] = $filledValueAttribute;
-        }
+        $column->options['property'] = $property->getName();
 
         return $column;
     }
@@ -136,7 +124,7 @@ class EntityMetadataResolver
 
     public function getTable(): Table
     {
-        $reflectionClass = new ReflectionClass($this->class);
+        $reflectionClass = new ReflectionClass($this->entity);
         $tableAttributes = $reflectionClass->getAttributes(Table::class);
 
         if (1 <= count($tableAttributes)) {
@@ -148,14 +136,22 @@ class EntityMetadataResolver
         return $table;
     }
 
-    public function getColumnAttributeOf(string $property): ?Column
+    public function getAttributes(string $property, string $attribute = null): array
     {
-        $reflectionClass = new ReflectionClass($this->class);
-        $property = $reflectionClass->getProperty($property);
-        $columnAttributes = $property->getAttributes(Column::class);
+        $reflectionClass = new ReflectionClass($this->entity);
+
+        return $reflectionClass->getProperty($property)->getAttributes($attribute);
+    }
+
+    public function getColumnAttribute(string $property): ?Column
+    {
+        $columnAttributes = $this->getAttributes($property, Column::class);
 
         if (1 <= \count($columnAttributes)) {
-            return $this->resolveColumnMetadata($columnAttributes[0]->newInstance(), $property);
+            $attr = $columnAttributes[0];
+            $attrInstance = $attr->newInstance();
+
+            return $this->resolveColumnMetadata($attrInstance, new ReflectionProperty($this->entity, $property));
         }
 
         return null;

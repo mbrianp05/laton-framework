@@ -3,6 +3,7 @@
 namespace Mbrianp\FuncCollection\ORM\Attributes;
 
 use Attribute;
+use Mbrianp\FuncCollection\ORM\ValueResolver;
 
 /**
  * When the value of the column is the value of another columns
@@ -20,12 +21,25 @@ use Attribute;
  *      public string $fullName;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class FilledValue
+class FilledValue implements ValueResolver
 {
     public function __construct(
         public array $columns,
         public ?string $pattern = null,
     )
     {
+    }
+
+    public function resolve(array $values): string
+    {
+        $values = \array_filter($values, fn(string $key): bool => \in_array($key, $this->columns),\ARRAY_FILTER_USE_KEY);
+        $pattern = \trim(\str_repeat('%s ', \count($values)));
+
+
+        if (null !== $this->pattern) {
+            $pattern = $this->pattern;
+        }
+
+        return \sprintf($pattern, ...\array_values($values));
     }
 }

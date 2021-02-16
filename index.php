@@ -6,6 +6,8 @@
  * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
  */
 
+// Factorized
+
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
 use Mbrianp\FuncCollection\Routing\ClassMap;
