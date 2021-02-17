@@ -6,10 +6,8 @@
  * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
  */
 
-// Arreglar errores
 // Hacer que la consulta SQL se confeccion a traves de clases.
-// Hacer que las dependencias se instalen con las clases
-
+// Hacer la funcionalidad de actualizar y eliminar registros
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
 use Mbrianp\FuncCollection\Routing\ClassMap;
@@ -22,9 +20,7 @@ require_once 'Autoloader.php';
 
 $autoloader = new Autoloader([
     'Mbrianp\FuncCollection' => 'classes',
-    'App\Controller' => 'src/Controller',
-    'App\Entity' => 'src/Entity',
-    'App\Repository' => 'src/Repository',
+    'App' => 'src',
 ]);
 $autoloader->run();
 

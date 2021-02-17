@@ -15,7 +15,11 @@ interface DatabaseDriverInterface
      * @param string|array|null $fields
      * @return QueryDriverInterface
      */
-    public function select(string $table, string|array|null $fields = null): QueryDriverInterface;
+    public function select(string $table, string|array|null $fields = null): SelectionDriverInterface;
+
+    public function remove(string $table): RemoveDriverInterface;
+
+    public function update(string $table, array|string|null $fields = null): UpdateDriverInterface;
 
     public function insert(string $table, array $values): bool;
 

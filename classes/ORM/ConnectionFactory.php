@@ -4,7 +4,7 @@ namespace Mbrianp\FuncCollection\ORM;
 
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
-use Mbrianp\FuncCollection\ORM\Drivers\MySQLDriver;
+use Mbrianp\FuncCollection\ORM\Drivers\MySQL\MySQLDriver;
 use PDO;
 
 /**

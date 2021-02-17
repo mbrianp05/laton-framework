@@ -1,11 +1,13 @@
 <?php
 
-namespace Mbrianp\FuncCollection\ORM\Drivers;
+namespace Mbrianp\FuncCollection\ORM\Drivers\MySQL;
 
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
-use Mbrianp\FuncCollection\ORM\EntityMetadataResolver;
-use Mbrianp\FuncCollection\ORM\ResultFormatter;
+use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
+use Mbrianp\FuncCollection\ORM\Drivers\RemoveDriverInterface;
+use Mbrianp\FuncCollection\ORM\Drivers\SelectionDriverInterface;
+use Mbrianp\FuncCollection\ORM\Drivers\UpdateDriverInterface;
 use Mbrianp\FuncCollection\ORM\Schema;
 use PDO;
 
@@ -15,11 +17,6 @@ class MySQLDriver implements DatabaseDriverInterface
 
     public function __construct(protected PDO $connection)
     {
-    }
-
-    public function select(string $table, string|array|null $fields = null): MySQLQueryDriver
-    {
-        return new MySQLQueryDriver($this->connection, $fields, $table);
     }
 
     /**
@@ -152,5 +149,18 @@ class MySQLDriver implements DatabaseDriverInterface
             'integer' => 'int',
             default => $phptype,
         };
+    }
+
+    public function remove(string $table): RemoveDriverInterface
+    {
+    }
+
+    public function update(string $table, array|string|null $fields = null): UpdateDriverInterface
+    {
+    }
+
+    public function select(string $table, string|array|null $fields = null): SelectionDriverInterface
+    {
+        return new MySQLSelectionQuery($this->connection, $table, $fields);
     }
 }
