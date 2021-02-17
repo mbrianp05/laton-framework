@@ -3,7 +3,7 @@
 namespace Mbrianp\FuncCollection\ORM\Attributes;
 
 use Attribute;
-use Mbrianp\FuncCollection\ORM\ValueResolver;
+use Mbrianp\FuncCollection\ORM\ValueResolverInterface;
 
 /**
  * When the value of the column is the value of another columns
@@ -21,7 +21,7 @@ use Mbrianp\FuncCollection\ORM\ValueResolver;
  *      public string $fullName;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class FilledValue implements ValueResolver
+class FilledValue implements ValueResolverInterface
 {
     public function __construct(
         public array $columns,

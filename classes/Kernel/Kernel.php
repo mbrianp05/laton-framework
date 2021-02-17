@@ -4,6 +4,7 @@ namespace Mbrianp\FuncCollection\Kernel;
 
 use Mbrianp\FuncCollection\DIC\DIC;
 use Mbrianp\FuncCollection\DIC\Service;
+use Mbrianp\FuncCollection\Http\HttpDependenciesDefinition;
 use Mbrianp\FuncCollection\Http\HttpParameterResolver;
 use Mbrianp\FuncCollection\Http\ParamStack;
 use Mbrianp\FuncCollection\Http\Request;
@@ -13,6 +14,7 @@ use Mbrianp\FuncCollection\ORM\ConnectionFactory;
 use Mbrianp\FuncCollection\ORM\ConnectionParameters;
 use Mbrianp\FuncCollection\ORM\EntityManager;
 use Mbrianp\FuncCollection\ORM\ORM;
+use Mbrianp\FuncCollection\ORM\ORMDependenciesDefinition;
 use Mbrianp\FuncCollection\ORM\ORMParameterResolver;
 use Mbrianp\FuncCollection\Routing\Attribute\Route;
 use Mbrianp\FuncCollection\Routing\Router;
@@ -34,6 +36,11 @@ class Kernel
         ORMParameterResolver::class,
     ];
 
+    protected array $servicesDefinition = [
+        HttpDependenciesDefinition::class,
+        ORMDependenciesDefinition::class,
+    ];
+
     protected const NESTED_ROUTES_SEPARATOR = '_';
 
     protected DIC $dependenciesContainer;
@@ -47,20 +54,14 @@ class Kernel
     {
         $this->dependenciesContainer = new DIC();
 
-        $get = new ParamStack($_GET);
-        $post = new ParamStack($_POST);
+        foreach ($this->servicesDefinition as $serviceDefinition) {
+            $definition = new $serviceDefinition($this->dependenciesContainer, $this->config);
+            $services = $definition->getServices();
 
-        $request = new Service('http.request', Request::class, [$get, $post, $_SERVER['PATH_INFO'] ?? '/', $_SERVER['REQUEST_METHOD']]);
-        $this->dependenciesContainer->addService($request);
-
-        // EntityManager
-        $ormService = new Service('db.orm', ORM::class, [$this->config['host'], $this->config['username'], $this->config['password'], $this->config['dbname'], $this->config['engine']]);
-        $this->dependenciesContainer->addService($ormService);
-
-        $orm = $this->dependenciesContainer->getService('db.orm')->getDriver();
-
-        $entityManagerService = new Service('db.entity_manager', EntityManager::class, [$orm]);
-        $this->dependenciesContainer->addService($entityManagerService);
+            foreach ($services as $service) {
+                $this->dependenciesContainer->addService($service);
+            }
+        }
     }
 
     /**
@@ -142,7 +143,7 @@ class Kernel
     {
         $router = $this->resolveRouterWithRoutes();
 
-        if (!$router->hasRoutes()) {
+        if (!$router->hasRoutes() && '/' == $request->path) {
             (new Response('If you are seeing this is because no route has been configured yet.', 200))->send();
 
             return;

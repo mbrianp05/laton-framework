@@ -3,6 +3,7 @@
 namespace Mbrianp\FuncCollection\ORM;
 
 use App\Entity\User;
+use LogicException;
 use Mbrianp\FuncCollection\DIC\DIC;
 use Mbrianp\FuncCollection\Kernel\ParameterResolver;
 use Mbrianp\FuncCollection\Routing\Attribute\Route;
@@ -39,6 +40,10 @@ class ORMParameterResolver implements ParameterResolver
 
         if (\str_starts_with($this->parameter->getType()->getName(), static::ENTITY_NAMESPACE)) {
             $this->target = 'entity';
+
+            if (!$this->parameter->getType()->allowsNull()) {
+                throw new LogicException(\sprintf('Parameter %s must accept null in case that no result will be found', $this->parameter->getType()->getName()));
+            }
 
             return true;
         }

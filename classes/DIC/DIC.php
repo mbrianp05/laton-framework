@@ -32,7 +32,7 @@ class DIC
             $service['class'] = $this->services[$id]->class;
             $service['params'] = $this->services[$id]->params;
 
-            $service = new $service['class'](...$service['params']);
+            $service = $this->services[$id]->newInstance();
             $this->instantiatedServices[$id] = $service;
 
             return $service;

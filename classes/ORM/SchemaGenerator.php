@@ -28,8 +28,10 @@ class SchemaGenerator
 
         foreach ($schema->columns as $column) {
             if (\array_key_exists($column->type, ORM::getTypes())) {
-                $type = ORM::getTypes()[$column->type]::getFinalType();
-                $column->type = $type;
+                $type = ORM::getTypes()[$column->type];
+                Utils::checkType($type);
+
+                $column->type = $type::getFinalType();
             }
         }
 

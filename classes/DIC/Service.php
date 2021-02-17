@@ -11,4 +11,9 @@ class Service
     )
     {
     }
+
+    public function newInstance(): object
+    {
+        return new ($this->class)(...$this->params);
+    }
 }

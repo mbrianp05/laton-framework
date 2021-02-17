@@ -6,6 +6,10 @@
  * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
  */
 
+// Arreglar errores
+// Hacer que la consulta SQL se confeccion a traves de clases.
+// Hacer que las dependencias se instalen con las clases
+
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
 use Mbrianp\FuncCollection\Routing\ClassMap;

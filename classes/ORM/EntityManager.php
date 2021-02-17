@@ -4,6 +4,7 @@ namespace Mbrianp\FuncCollection\ORM;
 
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
+use Mbrianp\FuncCollection\ORM\Type\ORMTypeInterface;
 use ReflectionAttribute;
 
 class EntityManager
@@ -46,6 +47,10 @@ class EntityManager
             $value = null;
 
             foreach ($valueResolvers as $resolver) {
+                if (!Utils::classImplements($resolver->name, ValueResolverInterface::class)) {
+                    throw new LogicException(\sprintf('Value resolver %s must implement %s', $resolver->name, ValueResolver::class));
+                }
+
                 $resolver = $resolver->newInstance();
                 $value = $resolver->resolve($values);
             }
@@ -57,8 +62,9 @@ class EntityManager
             }
 
             if (\array_key_exists($column->type, $types)) {
-                $type = new $types[$column->type]();
+                Utils::checkType($types[$column->type]);
 
+                $type = new $types[$column->type]();
                 $value = $type->resolveToSQL($value);
             }
 

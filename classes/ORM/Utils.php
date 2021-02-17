@@ -2,6 +2,9 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
+use LogicException;
+use Mbrianp\FuncCollection\ORM\Type\ORMTypeInterface;
+
 class Utils
 {
     public const VOWELS = ['a', 'e', 'i', 'o', 'u'];
@@ -39,5 +42,17 @@ class Utils
         }
 
         return $word . 's';
+    }
+
+    public static function classImplements(string|object $class, string $interface): bool
+    {
+        return \in_array($interface, \class_implements($class));
+    }
+
+    public static function checkType(string|object $type): void
+    {
+        if (!Utils::classImplements($type, ORMTypeInterface::class)) {
+            throw new LogicException(\sprintf('Type %s must implement %s', $type, ORMTypeInterface::class));
+        }
     }
 }

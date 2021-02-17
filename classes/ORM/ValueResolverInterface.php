@@ -2,7 +2,7 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
-interface ValueResolver
+interface ValueResolverInterface
 {
     public function resolve(array $values): mixed;
 }
