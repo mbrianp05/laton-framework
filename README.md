@@ -261,6 +261,8 @@ class AppController
         // Tambien puedes actualizar un registro sin buscarlo en la base de datos
         // Solamente crear el objeto y asegurar que el ID sea del registro que se va a actualizar
         $manager->persist($user);
+        
+        // Para eliminar
         $manager->remove($user);
         
         // Response here
