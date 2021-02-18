@@ -17,7 +17,7 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
 require_once 'Autoloader.php';
 
 $autoloader = new Autoloader([
-    'Mbrianp\FuncCollection' => 'classes',
+    'Mbrianp\FuncCollection' => 'vendor',
     'App' => 'src',
 ]);
 $autoloader->run();

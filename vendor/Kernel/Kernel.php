@@ -138,8 +138,11 @@ class Kernel
     {
         $router = $this->resolveRouterWithRoutes();
 
+        // Render framework's pages like NotFound or Default Home Page
+        $templateManager = new TemplateManager($this->dependenciesContainer,__DIR__ . '/templates');
+
         if (!$router->hasRoutes() && '/' == $request->path) {
-            (new Response('If you are seeing this is because no route has been configured yet.', 200))->send();
+            (new Response($templateManager->render('DefaultHomepage.html.php'), 200))->send();
 
             return;
         }
@@ -147,7 +150,6 @@ class Kernel
         $route = $router->resolveCurrentRoute($request);
 
         if (null == $route) {
-            $templateManager = new TemplateManager(__DIR__ . '/templates');
             (new Response($templateManager->render('NotFound.html.php', ['path' => $request->path]), 404))->send();
 
             return;
