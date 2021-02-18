@@ -96,7 +96,7 @@
         <strong>Don't forget register it in map.php</strong>
     </p>
     <div>
-        <a href="https://github.com/mbrianp05/laton.git">
+        <a href="https://github.com/mbrianp05/Laton">
             <span class="fa fab fa-4x fa-github"></span>
             GitHub
         </a>
