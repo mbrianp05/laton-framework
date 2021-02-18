@@ -31,7 +31,7 @@ class Kernel
         ORMParameterResolver::class,
     ];
 
-    protected array $servicesDefinition = [
+    protected array $servicesDefinitions = [
         HttpDependenciesDefinition::class,
         ORMDependenciesDefinition::class,
     ];
@@ -49,7 +49,7 @@ class Kernel
     {
         $this->dependenciesContainer = new DIC();
 
-        foreach ($this->servicesDefinition as $serviceDefinition) {
+        foreach ($this->servicesDefinitions as $serviceDefinition) {
             $definition = new $serviceDefinition($this->dependenciesContainer, $this->config);
             $services = $definition->getServices();
 
@@ -121,7 +121,6 @@ class Kernel
                  * @var ParameterResolver $resolver
                  */
                 $resolver = new $parameterResolver($this->dependenciesContainer);
-
 
                 if ($resolver->supports($parameter)) {
                     $resolvedParameters[] = $resolver->resolve();
