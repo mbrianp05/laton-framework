@@ -9,7 +9,7 @@ Laton Web Framework
 
 ##### Los controladores se registran en map.php
 
-Un controlador luce:
+Un controlador se crea en `src/controller` y luce asi:
 
 ```php
 namespace App\Controller;
@@ -40,7 +40,7 @@ class ControllerName extends AbstractController
      * 
      * No importa el orden de los parametros, puedes alternarlos como quieras 
      */
-    #[Route('/{parametro}', name: 'index')]
+    #[Route('/{parametro}', name: 'index_con_parametro')]
     public function metodo2(string $parametro, Request $request, Routing $routing): Response
     {
         // La vista se buscara en la carpeta templates
@@ -61,10 +61,14 @@ class ControllerName extends AbstractController
 ```
 
 En la vista tienes acceso a las variables que pasaste en el controlador
+
 ```php
+<?php use Mbrianp\FuncCollection\View\ViewHelper; ?>
 <html>
     <body>
-        <?php echo $param1; ?>
+        <?php echo $param1 ?>
+        <!-- Generar rutas -->
+        <?php echo ViewHelper::generateUrl('index_con_parametro', ['parametro' => '1']) ?>
     </body>
 </html>
 ```
@@ -214,7 +218,7 @@ class UserRepository extends AbstractRepository
 ```
 
 Lo unico que exige AbstractRepository es que crees un metodo getRefEntity devolviendo la entidad a la que el repositorio esta relacionado.
-Para hacer las consultas puedes injectar en el controlador EntityManager y con el metodo getRepository(entityclass) obtienes el repositorio y algunos metodos para hacer consultas. Sin embargo puedes injectar directamente el repositorio tambien.
+Para hacer las consultas puedes injectar en el controlador EntityManager y con el metodo getRepository(entityclass) obtienes el repositorio y algunos metodos para hacer consultas. Sin embargo puedes injectar directamente el repositorio tambien (ya de paso explico como se actualiza y se borra un registro).
 
 ```php
 
@@ -245,7 +249,19 @@ class AppController
         $repository->findBy(['country' => 'Cuba']);
         
         // Filtrar la busqueda pero con un solo resultado
-        $repository->findOneBy(['country' => 'Cuba']);
+        $user = $repository->findOneBy(['country' => 'Cuba']);
+        
+        // Cambiar de valor la propiedad que se quiere actualizar
+        // Todas las demas propiedades tendran de valor el resultado de
+        // la base de datos con el metodo findOneBy
+        $user->country = 'Italy';
+        
+        // Va a actualizar dado que el Id esta definido
+        // Si el Id no esta definido pues insertara el registro
+        // Tambien puedes actualizar un registro sin buscarlo en la base de datos
+        // Solamente crear el objeto y asegurar que el ID sea del registro que se va a actualizar
+        $manager->persist($user);
+        $manager->remove($user);
         
         // Response here
     }

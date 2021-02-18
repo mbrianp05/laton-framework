@@ -47,6 +47,17 @@ class EntityManager
         return $this->insert($entity);
     }
 
+    public function remove(object $target): bool
+    {
+        $metadataResolver = new EntityMetadataResolver($target);
+        $idPropertyName = $metadataResolver->getIdProperty()->getName();
+        $table = $metadataResolver->getSchema()->table->name;
+
+        $id = $target->$idPropertyName;
+
+        return $this->driver->remove($table)->where($idPropertyName, $id)->do();
+    }
+
     protected function resolveRealArrayValues(object $entity): array
     {
         $metadataResolver = new EntityMetadataResolver($entity);
