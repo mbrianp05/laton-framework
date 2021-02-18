@@ -10,11 +10,16 @@
         body, html {
             width: 100%;
             height: 100%;
-            font-family:    arial, sans-serif;
+            font-family: arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
+            /*background-image: url("vendor/kernel/templates/assets/img/banner.jpg");*/
+            /*background-position: center center;*/
+            /*background-repeat: no-repeat;*/
+            /*background-attachment: fixed;*/
+            /*background-size: cover;*/
         }
 
         .container {
@@ -23,6 +28,9 @@
             justify-content: center;
             align-content: center;
             height: 100%;
+            background-color: rgba(250, 250, 250, .8);
+            position: relative;
+            z-index: 1;
         }
 
         p {
@@ -73,31 +81,50 @@
 
         h1 {
             margin: 0 0 0 5px;
-            font-size: 35px;
+            font-size: 33px;
         }
 
         h3 {
             font-style: italic;
-            font-size: 20px;
+            font-size: 23px;
         }
 
         .bar {
+            position: relative;
             padding: 20px;
             width: 100%;
             box-sizing: border-box;
             font-weight: 400;
-            font-size: 16px;
+            font-size: 15px;
             box-shadow: 0 2px 2px rgba(0, 0, 0, .3);
-            color: #333;
+            color: #FFFFFF;
+            background-color: rgba(0, 0, 0, .8);
+            z-index: 1;
+            border-radius: 7px;
+        }
+
+        .back::before {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-right: 0 solid transparent;
+            border-bottom: 663px solid #cccccc;
+            border-left: 1300px solid transparent;
+            content: "";
+            z-index: 0;
+            right: 0;
         }
     </style>
     <title>Framework's homepage</title>
 </head>
 <body>
-<div class="bar">You are seeing this because no route has been configured yet.</div>
+<div class="back"></div>
 <div class="container">
     <h1>Welcome to Laton Web Framework</h1>
     <h3>Create your own web sites easily</h3>
+    <div class="bar">
+        You are seeing this because no route has been configured yet.
+    </div>
     <p>
         Don't care about common things anymore, this swift light framework provides you some useful functionalities that
         will help you make all websites you want.
