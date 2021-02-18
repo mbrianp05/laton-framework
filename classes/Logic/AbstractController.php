@@ -2,7 +2,6 @@
 
 namespace Mbrianp\FuncCollection\Logic;
 
-use Cassandra\FutureSession;
 use Mbrianp\FuncCollection\DIC\DIC;
 use Mbrianp\FuncCollection\Http\RedirectResponse;
 use Mbrianp\FuncCollection\Http\Response;
