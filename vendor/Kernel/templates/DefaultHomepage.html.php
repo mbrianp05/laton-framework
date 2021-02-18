@@ -31,16 +31,19 @@
             flex-basis: 70%;
             line-height: 1.5;
             margin-bottom: 0;
+            color: #222;
         }
 
         h1, h3 {
             flex-grow: 1;
             flex-basis: 100%;
             text-align: center;
+            color: #111;
         }
 
         p strong {
             display: block;
+            color: #222;
         }
 
         .container div {
@@ -51,7 +54,7 @@
 
         .container div a {
             text-decoration: none;
-            color: black;
+            color: #222222;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -85,12 +88,13 @@
             font-weight: 400;
             font-size: 16px;
             box-shadow: 0 2px 2px rgba(0, 0, 0, .3);
+            color: #333;
         }
     </style>
     <title>Framework's homepage</title>
 </head>
 <body>
-<div class="bar">You are seeing this is because no route has been configured yet.</div>
+<div class="bar">You are seeing this because no route has been configured yet.</div>
 <div class="container">
     <h1>Welcome to Laton Web Framework</h1>
     <h3>Create your own web sites easily</h3>
