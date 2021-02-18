@@ -100,7 +100,7 @@
             <span class="fa fab fa-4x fa-github"></span>
             GitHub
         </a>
-        <a href="https://twitter.com/mbrianp05">
+        <a href="https://twitter.com/MonteagudoBrian">
             <span class="fa fab fa-twitter fa-4x"></span>
             Twitter
         </a>
