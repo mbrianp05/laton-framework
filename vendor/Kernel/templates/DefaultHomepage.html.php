@@ -23,6 +23,7 @@
         }
 
         .container {
+            padding: 60px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
