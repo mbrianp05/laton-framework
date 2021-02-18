@@ -43,8 +43,7 @@ class ControllerName extends AbstractController
     #[Route('/{parametro}', name: 'index_con_parametro')]
     public function metodo2(string $parametro, Request $request, Routing $routing): Response
     {
-        // La vista se buscara en la carpeta templates
-        return $this->render('vista.php', ['param1' => 'hola']);
+        // Response here
     }
     
     /**
