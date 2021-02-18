@@ -131,7 +131,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Mbrianp\FuncCollection\Http\Response;
-use Mbrianp\FuncCollection\ORM\ORM;use Mbrianp\FuncCollection\ORM\SchemaGenerator;
+use Mbrianp\FuncCollection\ORM\ORM;
+use Mbrianp\FuncCollection\ORM\SchemaGenerator;
 
 class Controller
 {
