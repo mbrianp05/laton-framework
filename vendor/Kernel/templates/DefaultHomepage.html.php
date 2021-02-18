@@ -90,7 +90,7 @@
     <title>Framework's homepage</title>
 </head>
 <body>
-<div class="bar">You are seeing this because no route has been configured yet.</div>
+<div class="bar">You are seeing this is because no route has been configured yet.</div>
 <div class="container">
     <h1>Welcome to Laton Web Framework</h1>
     <h3>Create your own web sites easily</h3>
