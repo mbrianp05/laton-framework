@@ -97,7 +97,7 @@
             font-weight: 400;
             font-size: 15px;
             box-shadow: 0 2px 2px rgba(0, 0, 0, .3);
-            color: #FFFFFF;
+            color: #fafafa;
             background-color: rgba(0, 0, 0, .8);
             z-index: 1;
             border-radius: 7px;
@@ -108,10 +108,10 @@
             width: 0;
             height: 0;
             border-right: 0 solid transparent;
-            border-bottom: 663px solid #cccccc;
-            border-left: 1300px solid transparent;
+            border-bottom: 100vh solid #ccc;
+            border-left: 100vw solid transparent;
             content: "";
-            z-index: 0;
+            z-index: 1;
             right: 0;
         }
     </style>
