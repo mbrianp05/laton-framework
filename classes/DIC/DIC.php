@@ -26,18 +26,15 @@ class DIC
         $this->services[$service->id] = $service;
     }
 
-    public function getService(string $id): object
+    public function getService(string $id, bool $fromMemory = true): object
     {
-        if (!isset($this->instantiatedServices[$id])) {
-            $service['class'] = $this->services[$id]->class;
-            $service['params'] = $this->services[$id]->params;
-
-            $service = $this->services[$id]->newInstance();
+        if (!isset($this->instantiatedServices[$id]) || false == $fromMemory) {
+            $service = $this->services[$id];
             $this->instantiatedServices[$id] = $service;
 
-            return $service;
+            return $service->newInstance();
         }
 
-        return $this->instantiatedServices[$id];
+        return $this->instantiatedServices[$id]->newInstance();
     }
 }

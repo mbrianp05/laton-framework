@@ -19,7 +19,7 @@ interface DatabaseDriverInterface
 
     public function remove(string $table): RemoveDriverInterface;
 
-    public function update(string $table, array|string|null $fields = null): UpdateDriverInterface;
+    public function update(string $table, array $fields): UpdateDriverInterface;
 
     public function insert(string $table, array $values): bool;
 

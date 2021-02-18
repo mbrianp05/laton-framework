@@ -24,7 +24,7 @@ class ControllerName extends AbstractController
     #[Route('/', name: 'index')]
     public function method(): Response
     {
-        // La vista se buscara en la carpeta templates de src
+        // La vista se buscara en la carpeta templates
         return $this->render('vista.php', ['param1' => 'hola']);
     }
     
@@ -74,7 +74,7 @@ Los namespaces se corresponden a la carpeta src = App y todo lo demas de mantien
 
 #### Base de datos (aun no terminado)
 Para las bases de datos crea un entidad en src/Entity (el namespace App\Entity)
-y crea propiedades publicales y aplicale el atributo Column, solo las propiedades que tengan
+y crea propiedades publicas y aplicale el atributo Column, solo las propiedades que tengan
 el atributo seran interpretadas como columnas en la base de datos.
 
 ```php
@@ -128,14 +128,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Mbrianp\FuncCollection\Http\Response;
-use Mbrianp\FuncCollection\ORM\ORM;
+use Mbrianp\FuncCollection\ORM\ORM;use Mbrianp\FuncCollection\ORM\SchemaGenerator;
 
 class Controller
 {
     // Aqui se configura la ruta con #[Route]
-    public function createDatabase(ORM $orm): Response
+    public function createDatabase(ORM $orm, SchemaGenerator $schemaGenerator): Response
     {
-        $orm->getSchemaGenerator()->createEntityTable(User::class);
+        $schemaGenerator->createEntityTable(User::class);
+        
+        // Lo mismo de arriba
+        //$orm->getSchemaGenerator()->createEntityTable(User::class);
         
         return new Response('Content');
     }
@@ -226,9 +229,9 @@ use Mbrianp\FuncCollection\Routing\Attribute\Route;
 class AppController
 {
     // Aqui va la ruta
-    // La dos maneras del repository
     public function index(EntityManager $manager, UserRepository $repository): Response
     {
+        // Lo mismo que injectar UserRepository 
         $repository = $manager->getRepository(User::class);
         
         // Metodos
@@ -251,9 +254,12 @@ class AppController
      * Otra forma de hacer consultas es exigiendo la entidad como parametro
      * Esto funcionara siempre y cuando en la ruta haya un parametro que coincida con una propiedad (que sea columna) en la entidad
      * Por ej, aqui, en la ruta, hay parametro, id por lo tanto se va a buscar un usuario con el id que se pase en la URL
+     *
+     * El parametro es obligado tiparlo para asi saber en que tabla buscar
+     * y tambien debe aceptar null como valor en case de que no se encuentre ningun resultado 
      */
     #[Route('/profile/{id<\d+>}', name: 'profile')]
-    public function profile(User $user): Response
+    public function profile(?User $user): Response
     {
         return new Response(\var_export($user, true));
     }

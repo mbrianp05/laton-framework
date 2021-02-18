@@ -51,7 +51,7 @@ class ORMParameterResolver implements ParameterResolver
         return false;
     }
 
-    public function resolve(): object
+    public function resolve(): ?object
     {
         $type = $this->parameter->getType();
         $class = $type->getName();

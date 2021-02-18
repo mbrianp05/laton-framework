@@ -6,7 +6,7 @@ use PDO;
 
 interface UpdateDriverInterface extends QueryDriverInterface
 {
-    public function __construct(PDO $connection, string $table, array $fields);
+    public function __construct(PDO $connection, string $table, array $columns);
 
-    public function update(): array;
+    public function do(): bool;
 }

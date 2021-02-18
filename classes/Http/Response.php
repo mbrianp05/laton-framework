@@ -15,6 +15,7 @@ class Response
         public string $response = '',
         public int $status = 200,
         public string $contentType = self::AVAILABLE_CONTENT_TYPES['html'],
+        public array $headers = [],
     )
     {
         if (!in_array($this->contentType, self::AVAILABLE_CONTENT_TYPES)) {
@@ -27,6 +28,10 @@ class Response
         if (!headers_sent()) {
             header('HTTP/1.0 ' . $this->status);
             header('Content-Type: ' . $this->contentType);
+        }
+
+        foreach ($this->headers as $header => $value) {
+            header($header . ': ' . $value);
         }
 
         echo $this->response;

@@ -155,8 +155,9 @@ class MySQLDriver implements DatabaseDriverInterface
     {
     }
 
-    public function update(string $table, array|string|null $fields = null): UpdateDriverInterface
+    public function update(string $table, array $fields): UpdateDriverInterface
     {
+        return new MySQLUpdateQuery($this->connection, $table, $fields);
     }
 
     public function select(string $table, string|array|null $fields = null): SelectionDriverInterface

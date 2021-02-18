@@ -6,8 +6,6 @@
  * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
  */
 
-// Hacer que la consulta SQL se confeccion a traves de clases.
-// Hacer la funcionalidad de actualizar y eliminar registros
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
 use Mbrianp\FuncCollection\Routing\ClassMap;

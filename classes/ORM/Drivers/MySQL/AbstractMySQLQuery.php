@@ -5,6 +5,7 @@ namespace Mbrianp\FuncCollection\ORM\Drivers\MySQL;
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Helper\Condition;
 use PDO;
+use RuntimeException;
 
 abstract class AbstractMySQLQuery
 {
@@ -51,5 +52,33 @@ abstract class AbstractMySQLQuery
         $this->conditions[] = new Condition($field, $value, $operator, Condition::CONDITION_TYPES['or']);
 
         return $this;
+    }
+
+    protected function createSQLConditions(): string
+    {
+        $sql = '';
+        $whereCounter = 0;
+
+        if (0 != count($this->conditions)) {
+            foreach ($this->conditions as $condition) {
+                $sql .= match ($condition->type) {
+                    'OR' => ' OR WHERE',
+                    'AND' => ' AND WHERE',
+                    null => ' WHERE',
+                };
+
+                if (null == $condition->type) {
+                    $whereCounter++;
+
+                    if ($whereCounter > 1) {
+                        throw new RuntimeException('Cannot declare two where filters, once declared one, just orWhere and andWhere are allowed');
+                    }
+                }
+
+                $sql .= ' ' . $condition->column . ' ' . $condition->operator . ' ' . \var_export($condition->value, true);
+            }
+        }
+
+        return $sql;
     }
 }

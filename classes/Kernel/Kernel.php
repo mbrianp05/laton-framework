@@ -164,13 +164,14 @@ class Kernel
 
         if (\in_array(AbstractController::class, \class_parents($controller))) {
             $constructorParams[] = $this->config['templates_dir'];
+            $constructorParams[] = $this->dependenciesContainer;
         }
 
         $controller = new $controller(...$constructorParams);
         $response = $controller->$method(...$params);
 
         if (!$response instanceof Response) {
-            throw new \LogicException(\sprintf('Invalid data returned from %s::%s must be of type %s, %s given', $controller::class, $method, Response::class, get_debug_type($response)));
+            throw new \LogicException(\sprintf('Invalid data returned from %s::%s must be of type %s, %s given', $controller::class, $method, Response::class, \get_debug_type($response)));
         }
 
         $response->send();

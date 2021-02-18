@@ -8,5 +8,5 @@ interface RemoveDriverInterface extends QueryDriverInterface
 {
     public function __construct(PDO $connection, string $table);
 
-    public function remove(): array;
+    public function do(): bool;
 }

@@ -4,7 +4,6 @@ namespace Mbrianp\FuncCollection\ORM;
 
 use LogicException;
 use Mbrianp\FuncCollection\ORM\Drivers\DatabaseDriverInterface;
-use Mbrianp\FuncCollection\ORM\Type\ORMTypeInterface;
 use ReflectionAttribute;
 
 class EntityManager
@@ -29,7 +28,26 @@ class EntityManager
         return new $repository($this->driver);
     }
 
+    /**
+     * Determines if updating or persisting a data
+     * into the database
+     *
+     * If the ID is defined then this will update
+     * if it's not then a this will insert the registry
+     */
     public function persist(object $entity): bool
+    {
+        $metadataResolver = new EntityMetadataResolver($entity);
+        $id = $metadataResolver->getIdProperty();
+
+        if (null !== $entity->{$id->getName()}) {
+            return $this->update($entity);
+        }
+
+        return $this->insert($entity);
+    }
+
+    protected function resolveRealArrayValues(object $entity): array
     {
         $metadataResolver = new EntityMetadataResolver($entity);
         $schema = $metadataResolver->getSchema();
@@ -47,8 +65,8 @@ class EntityManager
             $value = null;
 
             foreach ($valueResolvers as $resolver) {
-                if (!Utils::classImplements($resolver->name, ValueResolverInterface::class)) {
-                    throw new LogicException(\sprintf('Value resolver %s must implement %s', $resolver->name, ValueResolver::class));
+                if (!Utils::classImplements($resolver->getName(), ValueResolverInterface::class)) {
+                    throw new LogicException(\sprintf('Value resolver %s must implement %s', $resolver->name, ValueResolverInterface::class));
                 }
 
                 $resolver = $resolver->newInstance();
@@ -71,6 +89,23 @@ class EntityManager
             $values[$column->options['property']] = $value;
         }
 
-        return $this->driver->insert($schema->table->name, $values);
+        return $values;
+    }
+
+    protected function insert(object $entity): bool
+    {
+        $metadataResolver = new EntityMetadataResolver($entity);
+        $table = $metadataResolver->getSchema()->table;
+
+        return $this->driver->insert($table, $this->resolveRealArrayValues($entity));
+    }
+
+    protected function update(object $entity): bool
+    {
+        $metadataResolver = new EntityMetadataResolver($entity);
+        $table = $metadataResolver->getSchema()->table->name;
+        $id = $metadataResolver->getIdProperty()->getname();
+
+        return $this->driver->update($table, $this->resolveRealArrayValues($entity))->where($id, $entity->$id)->do();
     }
 }

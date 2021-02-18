@@ -80,28 +80,7 @@ class MySQLSelectionQuery extends AbstractMySQLQuery implements SelectionDriverI
             $sql .= implode(', ', $this->selection->fields);
         }
 
-        $whereCounter = 0;
-        $sql .= ' FROM ' . $this->table;
-
-        if (0 != count($this->conditions)) {
-            foreach ($this->conditions as $condition) {
-                $sql .= match ($condition->type) {
-                    'OR' => ' OR WHERE',
-                    'AND' => ' AND WHERE',
-                    null => ' WHERE',
-                };
-
-                if (null == $condition->type) {
-                    $whereCounter++;
-
-                    if ($whereCounter > 1) {
-                        throw new RuntimeException('Cannot declare two where filters, once declared one, just orWhere and andWhere are allowed');
-                    }
-                }
-
-                $sql .= ' ' . $condition->column . ' ' . $condition->operator . ' ' . \var_export($condition->value, true);
-            }
-        }
+        $sql .= ' FROM ' . $this->table . parent::createSQLConditions();
 
         if (!empty($this->orderBy)) {
             $sql .= ' ORDER BY ';
