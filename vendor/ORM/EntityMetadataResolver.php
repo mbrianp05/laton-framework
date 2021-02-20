@@ -2,13 +2,21 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
+use LogicException;
 use Mbrianp\FuncCollection\ORM\Attributes\Id;
+use Mbrianp\FuncCollection\ORM\Attributes\ManyToMany;
+use Mbrianp\FuncCollection\ORM\Attributes\ManyToOne;
+use Mbrianp\FuncCollection\ORM\Attributes\OneToMany;
+use Mbrianp\FuncCollection\ORM\Attributes\OneToOne;
 use Mbrianp\FuncCollection\ORM\Attributes\Repository;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use Mbrianp\FuncCollection\ORM\Attributes\Table;
+use Reflection;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionUnionType;
+use RuntimeException;
 
 /**
  * This class obtains some useful metadata from Entity attributes (related to
@@ -31,6 +39,11 @@ class EntityMetadataResolver
         }
 
         return null;
+    }
+
+    public function getReflection(): ReflectionClass
+    {
+        return new ReflectionClass($this->entity);
     }
 
     /**
@@ -80,7 +93,13 @@ class EntityMetadataResolver
                 $columnAttribute->options['PRIMARY_KEY'] = true;
             }
 
-            $columns[] = $columnAttribute;
+            $column = $this->resolveColumnMetadata($columnAttribute, $property);
+
+            if (isset($column->options['deleted'])) {
+                continue;
+            }
+
+            $columns[] = $column;
         }
 
         return $columns;
@@ -104,17 +123,74 @@ class EntityMetadataResolver
             $column->name = Utils::resolveValidIdentifier($property->getName());
         }
 
+        $column->options['property'] = $property->getName();
+
         if (null == $column->type) {
             $column->type = 'string';
 
             if (!$property->getType() instanceof ReflectionUnionType) {
                 $column->type = $property->getType()->getName();
             }
+
+            if ($this->isRelation($property)) {
+                $this->resolveColumnRelation($column, $property);
+            }
         }
 
-        $column->options['property'] = $property->getName();
-
         return $column;
+    }
+
+    public function getRelationAttribute(ReflectionProperty $property): ?ReflectionAttribute
+    {
+        $relationAttributes = [
+            OneToMany::class,
+            ManyToOne::class,
+            OneToOne::class,
+            ManyToMany::class,
+        ];
+
+        foreach ($relationAttributes as $relationAttribute) {
+            if (1 <= count($property->getAttributes($relationAttribute))) {
+                return $property->getAttributes($relationAttribute)[0];
+            }
+        }
+
+        return null;
+    }
+
+    public function resolveColumnRelation(Column $column, ReflectionProperty $property): void
+    {
+        $attr = $this->getRelationAttribute($property);
+        $attrInstance = null;
+
+        if (null == $attr) {
+            throw new RuntimeException(\sprintf('Property %s has no attribute for assigning a relation', $property->getName()));
+        }
+
+        switch ($attr->getName()) {
+            case ManyToOne::class:
+            case OneToOne::class:
+                $column->type = 'int';
+                $column->name .= '_id';
+
+                return;
+        }
+
+        $column->options['deleted'] = true;
+    }
+
+    public function getRelationColumns(ReflectionClass $class): array
+    {
+        return \array_filter($class->getProperties(), fn(ReflectionProperty $prop): bool => $this->isRelation($prop));
+    }
+
+    public function isRelation(ReflectionProperty $property): bool
+    {
+        return
+            (1 <= count($property->getAttributes(OneToMany::class)))
+            || (1 <= count($property->getAttributes(ManyToOne::class)))
+            || (1 <= count($property->getAttributes(ManyToMany::class)))
+            || (1 <= count($property->getAttributes(OneToOne::class)));
     }
 
     public function getTableName(): string

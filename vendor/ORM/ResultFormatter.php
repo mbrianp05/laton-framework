@@ -2,6 +2,7 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
+use App\Entity\User;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use RuntimeException;
 
@@ -31,12 +32,21 @@ use RuntimeException;
  */
 class ResultFormatter
 {
-    public function __construct(protected string $entity)
+    public function __construct(protected string $entity, protected array $mapping = [])
     {
     }
 
-    protected function formatValue(string $value, Column $column): mixed
+    protected function formatValue(string|array $value, Column $column): mixed
     {
+
+        if (\array_key_exists($column->name, $this->mapping)) {
+            return $value;
+        }
+
+        if (\is_array($value)) {
+            return $value;
+        }
+
         $types = ORM::getTypes();
 
         if (!\array_key_exists($column->type, $types)) {
@@ -56,13 +66,22 @@ class ResultFormatter
 
         foreach ($result as $property => $value) {
             if (!\is_string($property)) {
-                throw new RuntimeException(\sprintf('Cannot assign the value %s to an unknown property', $value));
+                throw new RuntimeException(\sprintf('Cannot assign a value to an unknown property'));
             }
 
             $property = \array_filter(\array_keys(\get_class_vars($entityInstance::class)), fn(string $property_): bool => \strtolower($property_) == $property);
 
-            if (1 >= count($property)) {
+            if (1 <= count($property)) {
                 $property = $property[\array_key_first($property)];
+            } else {
+                continue;
+            }
+
+
+            if (\array_key_exists($property, $this->mapping)) {
+                $entityInstance->$property = $this->mapping[$property];
+
+                continue;
             }
 
             $entityInstance->$property = $this->formatValue($value, $entityMetadata->getColumnAttribute($property));

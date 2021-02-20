@@ -1,5 +1,6 @@
 <?php
 
+use App\Controller\AppController;
 use Mbrianp\FuncCollection\Routing\ClassMap;
 
-// ClassMap::map(ControllerName::class);
+ClassMap::map(AppController::class);

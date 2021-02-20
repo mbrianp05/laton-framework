@@ -84,8 +84,15 @@ class Router
 
     public function resolveCurrentRoute(Request $request): ?Route
     {
+        $path = $request->path;
+
+        // For adding compatibility for both kinds of URLs: /users and /users/
+        if (\str_ends_with($request->path, '/')) {
+            $path = \substr($request->path, 0, -1);
+        }
+
         foreach ($this->routes as $route) {
-            if (\in_array($request->method, $route->methods) && preg_match($this->toMatchExpression($route), $request->path, $parameters)) {
+            if (\in_array($request->method, $route->methods) && preg_match($this->toMatchExpression($route), $path, $parameters)) {
                 $parameters = $this->resolveParameters($parameters);
                 $route->parameters = $parameters;
 
