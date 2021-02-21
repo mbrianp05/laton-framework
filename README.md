@@ -4,7 +4,7 @@ Laton Web Framework
 ### PHP 8 requerido
 
 ### Descargar
-`git clone https://github.com/mbrianp05/orm.git` luego `composer install`
+`git clone  https://github.com/mbrianp05/Laton.git` luego `composer install`
 
 ### Para usarlo usa la consola de XAMPP y dirigete a la carpeta del framework y ejecuta "php --server localhost:90"
 
