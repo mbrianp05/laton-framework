@@ -4,14 +4,13 @@ Laton Web Framework
 ### PHP 8 requerido
 
 ### Descargar
-`git clone  https://github.com/mbrianp05/Laton.git` luego `composer install`
+`git clone  https://github.com/mbrianp05/Laton.git` luego ubicate en la carpeta del proyecto y ejecuta `composer install`
 
 ### Uso
-Abre la consola de xampp o cualquiera que tenga acceso al comando php y ejecuta `php --server localhost:90`
+Abre la consola de xampp o cualquiera que tenga acceso al comando php y ejecuta (ubicado en la carpeta del proyecto) `php --server localhost:90`
+y abre el navegador en http://localhost:90
 
-### Abre el navegador en localhost:90
-
-##### Los controladores se registran en map.php
+**_Los controladores se registran en map.php_**
 
 Un controlador se crea en `src/controller` y luce asi:
 
