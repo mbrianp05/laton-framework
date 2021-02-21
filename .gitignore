@@ -1,2 +1,4 @@
 .idea
 templates/*
+composer.lock
+/vendor/

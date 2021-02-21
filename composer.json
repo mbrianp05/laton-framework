@@ -1,0 +1,21 @@
+{
+    "name": "mbrian/laton",
+    "description": "A Web Framework",
+    "type": "project",
+    "require": {
+        "mbrianp/kernel": "*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Brian",
+            "email": "mbrianp05@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

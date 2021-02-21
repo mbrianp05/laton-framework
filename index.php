@@ -14,13 +14,7 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
     throw new RuntimeException('PHP 8 version is required.');
 }
 
-require_once 'Autoloader.php';
-
-$autoloader = new Autoloader([
-    'Mbrianp\FuncCollection' => 'vendor',
-    'App' => 'src',
-]);
-$autoloader->run();
+require_once __DIR__ . '/vendor/autoload.php';
 
 require_once 'map.php';
 
