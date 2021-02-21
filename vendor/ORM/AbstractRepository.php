@@ -26,8 +26,8 @@ abstract class AbstractRepository
     private function formatResults(array $results): object|array
     {
         $formatter = new ResultFormatter($this->entity, $this->mapping);
-        $formattedResults = $formatter->format($results);
-        return $this->relateResults($formattedResults);
+
+        return $formatter->format($results);
     }
 
     public function find(int $id): ?object
@@ -98,49 +98,6 @@ abstract class AbstractRepository
 
         $results = $query->getResults();
         $results = $this->formatResults($results);
-
-        return $results;
-    }
-
-    protected function relateResults(array $results): array
-    {
-        $relatedProperties = $this->metadataResolver->getRelationColumns(new ReflectionClass($this->entity));
-        $relatedPropertyNames = \array_map(fn (ReflectionProperty $prop): string => $prop->getName(), $relatedProperties);
-        $relations = \array_map(fn (ReflectionProperty $prop): object => $this->metadataResolver->getRelationAttribute($prop)->newInstance(), $relatedProperties);
-        $relations = \array_combine($relatedPropertyNames, $relations);
-
-        foreach ($results as $result) {
-            foreach ($relations as $property => $relation) {
-                if (\array_key_exists($property, $this->mapping)) {
-                    continue;
-                }
-
-                $reflection = new ReflectionClass($this->entity);
-                $property = $reflection->getProperty($property);
-                $relationAttr = $this->metadataResolver->getRelationAttribute($property)->newInstance();
-
-
-                if (\in_array($property->getName(), $this->mapping)) {
-                    continue;
-                }
-
-                $relatedEntity = $relationAttr->targetEntity;
-                $mappedBy = $relationAttr->mappedBy ?? $this->metadataResolver->getTableName() . '_id';
-
-
-                $emr = new EntityMetadataResolver($relatedEntity);
-                $repository = $emr->getRepositoryClass();
-
-                if (null == $repository) {
-                    throw new LogicException(\sprintf('Entity %s does not have configured a repository', $relatedEntity));
-                }
-
-                $repository = new $repository($this->driver, [$mappedBy => $result]);
-                $repositoryResults = $repository->findBy([$mappedBy => $result->id]);
-
-                $result->{$property->getName()} = $repositoryResults;
-            }
-        }
 
         return $results;
     }

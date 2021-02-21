@@ -2,7 +2,6 @@
 
 namespace Mbrianp\FuncCollection\ORM;
 
-use App\Entity\User;
 use Mbrianp\FuncCollection\ORM\Attributes\Column;
 use RuntimeException;
 
@@ -76,7 +75,6 @@ class ResultFormatter
             } else {
                 continue;
             }
-
 
             if (\array_key_exists($property, $this->mapping)) {
                 $entityInstance->$property = $this->mapping[$property];
