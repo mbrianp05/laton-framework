@@ -10,6 +10,8 @@ Laton Web Framework
 Abre la consola de xampp o cualquiera que tenga acceso al comando php y ejecuta (ubicado en la carpeta del proyecto) `php --server localhost:90`
 y abre el navegador en http://localhost:90
 
+### Empezando
+
 **_Los controladores se registran en map.php_**
 
 Un controlador se crea en `src/controller` y luce asi:
