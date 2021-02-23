@@ -14,11 +14,12 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
     throw new RuntimeException('PHP 8 version is required.');
 }
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+define("BASE_DIR", dirname(__DIR__));
 
-require_once dirname(__DIR__) . 'map.php';
+require_once BASE_DIR . '/vendor/autoload.php';
+require_once BASE_DIR . '/map.php';
 
-$config = parse_ini_file(__DIR__ . '/.ini');
+$config = parse_ini_file(BASE_DIR . '/.ini');
 
 $classes = ClassMap::$classes;
 $kernel = new Kernel($config, $classes);
