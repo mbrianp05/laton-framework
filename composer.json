@@ -12,7 +12,7 @@
             "email": "mbrianp05@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "App\\": "src/"
