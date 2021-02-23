@@ -14,7 +14,7 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
     throw new RuntimeException('PHP 8 version is required.');
 }
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 require_once 'map.php';
 
