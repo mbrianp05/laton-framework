@@ -289,5 +289,3 @@ class AppController
 }
 
 ```
-
-Por ahora eso es todo mas tarde lo separare todo en componentes para instalarlos por composer.
