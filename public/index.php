@@ -16,7 +16,7 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-require_once 'map.php';
+require_once dirname(__DIR__) . 'map.php';
 
 $config = parse_ini_file(__DIR__ . '/.ini');
 
