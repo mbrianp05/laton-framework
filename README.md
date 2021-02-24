@@ -29,7 +29,7 @@ class ControllerName extends AbstractController
     #[Route('/', name: 'index')]
     public function method(): Response
     {
-        // La vista se buscara en la carpeta templates
+        // La vista se buscara en la carpeta que se defina en el .ini
         return $this->render('vista.php', ['param1' => 'hola']);
     }
     
