@@ -1,5 +1,5 @@
 {
-    "name": "mbrian/laton",
+    "name": "laton/framework",
     "description": "A Web Framework",
     "type": "project",
     "require": {
