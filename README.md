@@ -5,6 +5,7 @@ Laton Web Framework
 
 ### Descargar
 `git clone  https://github.com/mbrianp05/Laton.git` luego ubicate en la carpeta del proyecto y ejecuta `composer install`
+o tambien composer `create-project laton/framework <nombre_del_proyecto>` y es exactamente lo mismo.
 
 ### Uso
 Abre la consola de xampp o cualquiera que tenga acceso al comando php y ejecuta (ubicado en la carpeta del proyecto) `php --server localhost:90 -t public`
