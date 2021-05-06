@@ -1,6 +1,6 @@
 <?php
 /**
- * A WebFramework inspired on Symfony.
+ * A WebFramework inspired by Symfony.
  * Development started on 10/2/2021
  *
  * @author Brian Monteagudo Perez <mbrianp05@gmail.com>
@@ -8,7 +8,6 @@
 
 use Mbrianp\FuncCollection\Http\Request;
 use Mbrianp\FuncCollection\Kernel\Kernel;
-use Mbrianp\FuncCollection\Routing\ClassMap;
 
 if (version_compare(PHP_VERSION, '8.0', '<')) {
     throw new RuntimeException('PHP 8 version is required.');
@@ -17,11 +16,12 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
 define("BASE_DIR", dirname(__DIR__));
 
 require_once BASE_DIR . '/vendor/autoload.php';
-require_once BASE_DIR . '/map.php';
 
 $config = parse_ini_file(BASE_DIR . '/.ini');
 
-$classes = ClassMap::$classes;
-$kernel = new Kernel($config, $classes);
+// Configuring folders
+$config['root'] = BASE_DIR;
+$config['templates_dir'] = $config['root'] . '\\' . $config['templates_dir'];
 
+$kernel = new Kernel($config);
 $kernel->deployApp(Request::createFromGlobals());
